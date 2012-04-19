@@ -13,7 +13,7 @@ class Echo360
                   :http_method => :get }
   
     @access_token = OAuth::AccessToken.new consumer
-    @organisation = getOrganizations[organisation][:id]
+    @organisation = get_organizations[organisation][:id]
   end
 
   def get_users
@@ -40,7 +40,7 @@ class Echo360
     { id: id, first_name: first_name, last_name: last_name, user_id: user_id }
   end
   
-  def createUser user_id, password, first_name, last_name, role, email
+  def create_user user_id, password, first_name, last_name, role, email
     builder = Nokogiri::XML::Builder.new do |xml|
       xml.person {
         xml.send(:"first-name", first_name)
@@ -69,7 +69,7 @@ class Echo360
     Nokogiri.XML @access_token.get("/ess/scheduleapi/v1/people").body
   end
   
-  def getOrganizations
+  def get_organizations
     response = @access_token.get "/ess/scheduleapi/v1/organizations"
     org_xml = Nokogiri.XML response.body
 
