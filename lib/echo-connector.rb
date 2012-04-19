@@ -5,7 +5,7 @@ module Echo360
 
 class Echo360
   def initialize(site, consumer_key, consumer_secret, organisation = 0)
-    consumer=OAuth::Consumer.new consumer_key, consumer_secret, 
+    consumer = OAuth::Consumer.new consumer_key, consumer_secret, 
                 { :site => site,
                   :request_token_path => "",
                   :authorize_path => "",
@@ -16,8 +16,8 @@ class Echo360
     @organisation = getOrganizations[organisation][:id]
   end
 
-  def getUsers
-    users_xml = getUsersXML
+  def get_users
+    users_xml = get_users_xml
     users = Array.new
     users_xml.xpath("/people/person").each do |person|
       id = person.search('id')[0].content 
@@ -26,11 +26,11 @@ class Echo360
       user_id = person.search('user-name')[0].content
       users << { id: id, first_name: first_name, last_name: last_name, user_id: user_id }
     end
-    return users
+    users
   end
 
-  def getUser user_id
-    users_xml = getUsersXML
+  def get_user user_id
+    users_xml = get_users_xml
     person = users_xml.xpath("/people/person[user-name/text() = \"#{user_id}\"]")[0]
     raise "User not found: #{user_id}" if person.nil?
     id = person.search('id')[0].content
@@ -65,7 +65,7 @@ class Echo360
   
   private
   
-  def getUsersXML
+  def get_users_xml
     Nokogiri.XML @access_token.get("/ess/scheduleapi/v1/people").body
   end
   
@@ -81,7 +81,7 @@ class Echo360
       orgs << { name: name, id: id }
     end
 
-    return orgs
+    orgs
   end
 end
 
