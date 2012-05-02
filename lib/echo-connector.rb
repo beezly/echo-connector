@@ -25,9 +25,9 @@ class Echo360
     Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{campus_id}").body)["campus"]
   end
   
-  def get_buildings campus_id = nil
-    if campus_id 
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{campus_id}/buildings").body)["buildings"]["building"]
+  def get_buildings arg = {}
+    if arg.has_key? :campus
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{arg[:campus]}/buildings").body)["buildings"]["building"]
     else
       Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings").body)["buildings"]["building"]
     end
@@ -37,9 +37,11 @@ class Echo360
     Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{building_id}").body)["building"]
   end
   
-  def get_rooms building_id = nil
-    if building_id
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{building_id}/rooms").body)["rooms"]["room"]
+  def get_rooms arg = {}
+    if arg.has_key? :building
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{arg[:building]}/rooms").body)["rooms"]["room"]
+    elsif arg.has_key? :campus
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{arg[:campus]}/rooms").body)["rooms"]["room"]
     else
       Nori.parse(@access_token.get("/ess/scheduleapi/v1/rooms").body)["rooms"]["room"]
     end
@@ -50,27 +52,12 @@ class Echo360
   end
   
   def get_users
-    users_xml = get_users_xml
-    users = Array.new
-    users_xml.xpath("/people/person").each do |person|
-      id = person.search('id')[0].content 
-      first_name = person.search('first-name')[0].content
-      last_name = person.search('last-name')[0].content
-      user_id = person.search('user-name')[0].content
-      users << { id: id, first_name: first_name, last_name: last_name, user_id: user_id }
-    end
-    users
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/people").body)["people"]["person"]
   end
 
   def get_user user_id
-    users_xml = get_users_xml
-    person = users_xml.xpath("/people/person[user-name/text() = \"#{user_id}\"]")[0]
-    raise "User not found: #{user_id}" if person.nil?
-    id = person.search('id')[0].content
-    first_name = person.search('first-name')[0].content
-    last_name = person.search('last-name')[0].content
-    user_id = person.search('user-name')[0].content
-    { id: id, first_name: first_name, last_name: last_name, user_id: user_id }
+    users = get_users
+    users.detect {|u| u["user_name"] == user_id }
   end
   
   def create_user user_id, password, first_name, last_name, role, email
