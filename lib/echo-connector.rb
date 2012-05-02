@@ -85,10 +85,6 @@ class Echo360
   
   private
   
-  def get_users_xml
-    Nokogiri.XML @access_token.get("/ess/scheduleapi/v1/people").body
-  end
-  
   def get_organizations
     response = @access_token.get "/ess/scheduleapi/v1/organizations"
     org_xml = Nokogiri.XML response.body
