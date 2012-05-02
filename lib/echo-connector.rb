@@ -1,5 +1,6 @@
 require "oauth"
 require "nokogiri"
+require 'nori'
 
 module Echo360
 
@@ -16,6 +17,38 @@ class Echo360
     @organisation = get_organizations[organisation][:id]
   end
 
+  def get_campuses term = nil
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/").body)["campuses"]["campus"]
+  end
+  
+  def get_campus campus_id
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{campus_id}").body)["campus"]
+  end
+  
+  def get_buildings campus_id = nil
+    if campus_id 
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{campus_id}/buildings").body)["buildings"]["building"]
+    else
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings").body)["buildings"]["building"]
+    end
+  end
+  
+  def get_building building_id
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{building_id}").body)["building"]
+  end
+  
+  def get_rooms building_id = nil
+    if building_id
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{building_id}/rooms").body)["rooms"]["room"]
+    else
+      Nori.parse(@access_token.get("/ess/scheduleapi/v1/rooms").body)["rooms"]["room"]
+    end
+  end
+  
+  def get_room room_id
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/rooms/#{room_id}").body)["room"]
+  end
+  
   def get_users
     users_xml = get_users_xml
     users = Array.new
