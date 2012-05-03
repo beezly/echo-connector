@@ -5,6 +5,7 @@ require 'nori'
 module Echo360
 
 class Echo360
+  # Create connection to Echo360 server
   def initialize(site, consumer_key, consumer_secret, organisation = 0)
     consumer = OAuth::Consumer.new consumer_key, consumer_secret, 
                 { :site => site,
@@ -54,7 +55,41 @@ class Echo360
   def get_users
     as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/people").body)["people"]["person"]
   end
-
+  
+  def get_terms 
+    as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/terms").body)["terms"]["term"]
+  end
+  
+  def get_term term_id
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/terms/#{term_id}").body)["term"]
+  end
+  
+  def get_courses arg = {}
+    if arg.has_key? :term_id
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/terms/#{arg[:term_id]}/courses").body)["courses"]["course"]
+    else
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/courses").body)["courses"]["course"]
+    end
+  end
+  
+  def get_course course_id
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/courses/#{course_id}").body)["course"]
+  end
+  
+  def get_sections arg = {}
+    if (arg.has_key?(:term_id) && arg.has_key?(:course_id))
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/terms/#{arg[:term_id]}/courses/#{arg[:course_id]}/sections").body)["sections"]["section"]
+    else
+      if arg.has_key? :course_id
+        as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/courses/#{arg[:course_id]}/sections").body)["sections"]["section"]
+      elsif arg.has_key? :term_id
+        as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/terms/#{arg[:term_id]}/sections").body)["sections"]["section"]
+      else
+        as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/sections").body)["sections"]["section"]
+      end
+    end
+  end
+  
   def get_user user_id
     users = get_users
     users.detect {|u| u["user_name"] == user_id }
