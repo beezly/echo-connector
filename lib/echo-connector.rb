@@ -9,7 +9,6 @@ class Echo360
   # Create an instance of the Echo360 interface
   #
   # ==== Attributes
-  # +args+ - Valid args are listed below
   # * +site+ - Echo360 server URI (no default)
   # * +consumer_key+ - OAUTH Consumer Key (no default)
   # * +consumer_secret+ - OAUTH Consumer Secret (no default)
