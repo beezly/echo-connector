@@ -18,7 +18,7 @@ class Echo360
   end
 
   def get_campuses term = nil
-    Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/").body)["campuses"]["campus"]
+    as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/").body)["campuses"]["campus"]
   end
   
   def get_campus campus_id
@@ -27,9 +27,9 @@ class Echo360
   
   def get_buildings arg = {}
     if arg.has_key? :campus
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{arg[:campus]}/buildings").body)["buildings"]["building"]
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{arg[:campus]}/buildings").body)["buildings"]["building"]
     else
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings").body)["buildings"]["building"]
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings").body)["buildings"]["building"]
     end
   end
   
@@ -39,11 +39,11 @@ class Echo360
   
   def get_rooms arg = {}
     if arg.has_key? :building
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{arg[:building]}/rooms").body)["rooms"]["room"]
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/buildings/#{arg[:building]}/rooms").body)["rooms"]["room"]
     elsif arg.has_key? :campus
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{arg[:campus]}/rooms").body)["rooms"]["room"]
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/campuses/#{arg[:campus]}/rooms").body)["rooms"]["room"]
     else
-      Nori.parse(@access_token.get("/ess/scheduleapi/v1/rooms").body)["rooms"]["room"]
+      as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/rooms").body)["rooms"]["room"]
     end
   end
   
@@ -52,7 +52,7 @@ class Echo360
   end
   
   def get_users
-    Nori.parse(@access_token.get("/ess/scheduleapi/v1/people").body)["people"]["person"]
+    as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/people").body)["people"]["person"]
   end
 
   def get_user user_id
@@ -84,7 +84,16 @@ class Echo360
   end
     
   def get_organizations
-    Nori.parse(@access_token.get("/ess/scheduleapi/v1/organizations").body)["organizations"]["organization"]
+    as_array Nori.parse(@access_token.get("/ess/scheduleapi/v1/organizations").body)['organizations']['organization']
+  end
+  
+  private
+  def as_array item
+    if item.class == Array
+      item
+    else
+      [item]
+    end
   end
 end
 
