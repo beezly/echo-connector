@@ -5,7 +5,15 @@ require 'nori'
 module Echo360
 
 class Echo360
-  # Create connection to Echo360 server
+  
+  # Create an instance of the Echo360 interface
+  #
+  # ==== Attributes
+  # +args+ - Valid args are listed below
+  # * +site+ - Echo360 server URI (no default)
+  # * +consumer_key+ - OAUTH Consumer Key (no default)
+  # * +consumer_secret+ - OAUTH Consumer Secret (no default)
+  # * +organisation+ - Organization to use (defaults to 0)  
   def initialize(site, consumer_key, consumer_secret, organisation = 0)
     consumer = OAuth::Consumer.new consumer_key, consumer_secret, 
                 { :site => site,
