@@ -14,7 +14,7 @@ class Echo360
                   :http_method => :get }
   
     @access_token = OAuth::AccessToken.new consumer
-    @organisation = get_organizations[organisation][:id]
+    @organisation = get_organizations[organisation]["id"]
   end
 
   def get_campuses term = nil
@@ -82,22 +82,9 @@ class Echo360
     rsp = @access_token.post("/ess/scheduleapi/v1/people", builder.to_xml,{ 'Accept' => 'application/xml', 'Content-Type' => 'application/xml' })
     !rsp.value
   end
-  
-  private
-  
+    
   def get_organizations
-    response = @access_token.get "/ess/scheduleapi/v1/organizations"
-    org_xml = Nokogiri.XML response.body
-
-    orgs = Array.new
-
-    org_xml.search('organization').each do |org|
-      id = org.search('id')[0].content
-      name = org.search('name')[0].content
-      orgs << { name: name, id: id }
-    end
-
-    orgs
+    Nori.parse(@access_token.get("/ess/scheduleapi/v1/organizations").body)["organizations"]["organization"]
   end
 end
 
